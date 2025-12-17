@@ -36,6 +36,7 @@ source "$SCRIPT_DIR/lib/check-conflicts.sh"
 source "$SCRIPT_DIR/lib/check-compose-drift.sh"
 source "$SCRIPT_DIR/lib/check-hardcoded-domain.sh"
 source "$SCRIPT_DIR/lib/check-env-backup.sh"
+source "$SCRIPT_DIR/lib/check-uptime-monitors.sh"
 
 # Track results
 ERRORS=0
@@ -119,6 +120,13 @@ echo ""
 # ==========================================
 echo -e "${BLUE}7. Checking .env.nas.backup sync...${NC}"
 check_env_backup
+echo ""
+
+# ==========================================
+# CHECK 8: Uptime Kuma Monitors (WARNS)
+# ==========================================
+echo -e "${BLUE}8. Checking Uptime Kuma monitors...${NC}"
+check_uptime_monitors
 echo ""
 
 # ==========================================

@@ -99,30 +99,16 @@ Skip the domain and access services directly via IP:port. All services work out 
 
 ---
 
-## ⚠️ CRITICAL: Ugreen NAS Port Conflict
+## Ugreen NAS Port Configuration
 
-**Before deploying, you MUST reconfigure the Ugreen NAS web interface ports or you will lose access!**
+The Ugreen NAS web interface (nginx) uses ports 80/443 by default. Rather than modifying nginx (which UGOS resets on updates), this stack configures **Traefik to use ports 8080/8443 instead**.
 
-The Ugreen NAS web interface (nginx) uses ports 80/443 by default. Traefik also needs these ports. **They cannot coexist on the same ports.**
+**How it works:**
+- Ugreen NAS UI stays on ports 80/443 (no changes needed)
+- Traefik listens on ports 8080/8443
+- Router port forwarding translates: external 80→8080, external 443→8443
 
-**Solution**: Move nginx to ports 8080/8443 BEFORE deploying Traefik:
-
-```bash
-# SSH to NAS, then run:
-for file in /etc/nginx/ugreen*.conf; do
-  sudo sed -i 's/listen 80/listen 8080/g' "$file"
-  sudo sed -i 's/listen \[::\]:80/listen [::]:8080/g' "$file"
-  sudo sed -i 's/listen 443/listen 8443/g' "$file"
-  sudo sed -i 's/listen \[::\]:443/listen [::]:8443/g' "$file"
-done
-sudo systemctl restart nginx
-```
-
-After this, access NAS UI at `http://NAS_IP:8080` and proceed with Traefik deployment.
-
-> **Note**: UGOS may reset nginx ports after system updates. See [Troubleshooting](docs/TROUBLESHOOTING.md#nginx-ports-reset-after-reboot-or-update) for a persistent solution.
-
-See [README-UGREEN.md](docs/README-UGREEN.md#-critical-ugreen-nas-port-conflict) for detailed instructions.
+**Or use Cloudflare Tunnel** (recommended) which bypasses port forwarding entirely - see [Cloudflare Tunnel Setup](docs/CLOUDFLARE-TUNNEL-SETUP.md).
 
 ---
 

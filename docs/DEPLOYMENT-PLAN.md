@@ -36,7 +36,7 @@ If you deploy in the wrong order, arr-stack will fail with "network not found" e
 
 ## Deployment Status
 
-- [ ] **Phase 1**: Nginx Port Reconfiguration
+- [ ] **Phase 1**: Enable SSH Access
 - [ ] **Phase 2**: Pre-deployment Setup
 - [ ] **Phase 3**: Traefik Deployment
 - [ ] **Phase 4**: VPN & Core Services
@@ -47,37 +47,24 @@ If you deploy in the wrong order, arr-stack will fail with "network not found" e
 
 ---
 
-## Phase 1: Nginx Port Reconfiguration
-
-⚠️ **DO THIS FIRST OR YOU WILL LOSE NAS ACCESS**
-
-**Why**: Ugreen NAS (nginx) and Traefik both want ports 80/443. Move nginx to 8080/8443.
-
-### Quick Steps
+## Phase 1: Enable SSH Access
 
 > **First**: Enable SSH in UGOS Control Panel → Terminal → SSH, set "Shut down automatically" to 2h.
 >
 > ![UGOS SSH Settings](images/UGOS-SSH.png)
 
-```bash
-# SSH to NAS
-ssh your-username@nas-ip
+### Port Configuration (No Action Needed)
 
-# Update all nginx configs (one command)
-for file in /etc/nginx/ugreen*.conf; do
-  sudo sed -i 's/listen 80/listen 8080/g' "$file"
-  sudo sed -i 's/listen \[::\]:80/listen [::]:8080/g' "$file"
-  sudo sed -i 's/listen 443/listen 8443/g' "$file"
-  sudo sed -i 's/listen \[::\]:443/listen [::]:8443/g' "$file"
-done
+Ugreen NAS (nginx) uses ports 80/443. Rather than modifying nginx (which UGOS resets on updates), this stack configures **Traefik to use ports 8080/8443 instead**.
 
-# Restart nginx (NOT stop!)
-sudo systemctl restart nginx
+| Service | Ports |
+|---------|-------|
+| Ugreen NAS UI (nginx) | 80, 443 |
+| Traefik | 8080, 8443 |
 
-# Test: Access NAS at http://nas-ip:8080
-```
-
-**Done**: NAS UI on port 8080, Traefik can use port 80/443
+**For external access**, either:
+- Configure router port forwarding: external 80→8080, 443→8443
+- Use Cloudflare Tunnel (recommended) - bypasses port forwarding entirely
 
 ---
 

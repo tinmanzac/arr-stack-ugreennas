@@ -262,66 +262,77 @@ For local-only access, skip this section and use URLs like `http://NAS_IP:8096`.
 
 ### Option A: Cloudflare Tunnel (Recommended)
 
-Cloudflare Tunnel connects outbound from your server, bypassing port forwarding and ISP restrictions.
+Cloudflare Tunnel connects outbound from your server, bypassing port forwarding and ISP restrictions. Uses wildcard DNS so you only need 2 records for all services.
+
+**1. Login to Cloudflare:**
+
+```bash
+cd /volume1/docker/arr-stack
+mkdir -p cloudflared && chmod 777 cloudflared
+docker run --rm -v ./cloudflared:/home/nonroot/.cloudflared cloudflare/cloudflared tunnel login
+```
+
+This prints a URL - open it, select your domain, and authorize. The cert is saved automatically.
+
+**2. Create the tunnel:**
+
+```bash
+docker run --rm -v ./cloudflared:/home/nonroot/.cloudflared cloudflare/cloudflared tunnel create nas-tunnel
+```
+
+Note the tunnel ID (e.g., `6271ac25-f8ea-4cd3-b269-ad9778c61272`).
+
+**3. Rename credentials and create config:**
+
+```bash
+# Rename credentials file
+mv cloudflared/*.json cloudflared/credentials.json
+
+# Create config (replace TUNNEL_ID and DOMAIN)
+cat > cloudflared/config.yml << 'EOF'
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /home/nonroot/.cloudflared/credentials.json
+
+ingress:
+  - hostname: "*.yourdomain.com"
+    service: http://traefik:80
+  - hostname: yourdomain.com
+    service: http://traefik:80
+  - service: http_status:404
+EOF
+```
+
+**4. Add DNS routes:**
+
+```bash
+docker run --rm -v ./cloudflared:/home/nonroot/.cloudflared cloudflare/cloudflared tunnel route dns nas-tunnel "*.yourdomain.com"
+docker run --rm -v ./cloudflared:/home/nonroot/.cloudflared cloudflare/cloudflared tunnel route dns nas-tunnel yourdomain.com
+```
+
+**5. Deploy** (see Step 4)
+
+<details>
+<summary><strong>Alternative: GUI-Managed Tunnel (Token-Based)</strong></summary>
+
+If you prefer configuring routes in the Cloudflare dashboard instead of a config file:
 
 | Step | Screenshot |
 |:-----|:-----------|
-| 1. Go to [one.dash.cloudflare.com](https://one.dash.cloudflare.com/) → Networks → Overview → **Manage Tunnels** | |
-| 2. Click **Add a tunnel** | <img src="images/Cloudflare tunnel/1.png" width="700"> |
-| 3. Name your tunnel (e.g., `Ugreen NAS`) → **Save** | <img src="images/Cloudflare tunnel/2.png" width="700"> |
-| 4. Choose **Docker** | <img src="images/Cloudflare tunnel/3.png" width="700"> |
-| 5. Copy the command containing your token | <img src="images/Cloudflare tunnel/4.png" width="700"> |
-| 6. Extract the token (the long string after `--token`) | <img src="images/Cloudflare tunnel/5.png" width="700"> |
+| 1. Go to [one.dash.cloudflare.com](https://one.dash.cloudflare.com/) → Networks → Tunnels → **Create a tunnel** | |
+| 2. Name your tunnel (e.g., `nas-tunnel`) → **Save** | <img src="images/Cloudflare tunnel/2.png" width="700"> |
+| 3. Choose **Docker** and copy the token | <img src="images/Cloudflare tunnel/4.png" width="700"> |
 
-7. Add the token to `.env`:
+4. Add the token to `.env`:
    ```bash
    TUNNEL_TOKEN=your_tunnel_token_here
    ```
 
-8. **Set up Published application routes** in Cloudflare. All routes point to Traefik, which handles routing:
-   | Subdomain | Service | URL |
-   |-----------|---------|-----|
-   | (root domain) | HTTP | traefik:80 |
-   | jellyfin | HTTP | traefik:80 |
-   | jellyseerr | HTTP | traefik:80 |
-   | sonarr | HTTP | traefik:80 |
-   | radarr | HTTP | traefik:80 |
-   | prowlarr | HTTP | traefik:80 |
-   | qbit | HTTP | traefik:80 |
-   | bazarr | HTTP | traefik:80 |
-   | pihole | HTTP | traefik:80 |
-   | wg | HTTP | traefik:80 |
-   | traefik | HTTP | traefik:80 |
-   | uptime | HTTP | traefik:80 |
+5. Update `docker-compose.cloudflared.yml` to use the token approach (see comments in file).
 
-9. **Deploy** (see Step 4)
+6. **Set up routes** in Cloudflare dashboard. Add each subdomain pointing to `http://traefik:80`:
+   - jellyfin, jellyseerr, sonarr, radarr, prowlarr, qbit, bazarr, pihole, wg, traefik, uptime
 
-<details>
-<summary><strong>Alternative: Config File (Locally-Managed Tunnel)</strong></summary>
-
-Instead of configuring routes in the Cloudflare dashboard, you can use a config file with wildcard routing. This is version-controllable and requires only one rule for all subdomains.
-
-1. Create the tunnel and download credentials:
-   ```bash
-   docker run --rm -it -v ./cloudflared:/root/.cloudflared cloudflare/cloudflared tunnel login
-   docker run --rm -it -v ./cloudflared:/root/.cloudflared cloudflare/cloudflared tunnel create nas-tunnel
-   ```
-
-2. Copy the example config and update with your tunnel ID:
-   ```bash
-   cp cloudflared/config.yml.example cloudflared/config.yml
-   # Edit config.yml: replace YOUR_TUNNEL_ID with the ID from step 1
-   # Replace yourdomain.com with your actual domain
-   ```
-
-3. Add DNS route for wildcard:
-   ```bash
-   docker run --rm -v ./cloudflared:/root/.cloudflared cloudflare/cloudflared tunnel route dns nas-tunnel "*.yourdomain.com"
-   ```
-
-4. Update `docker-compose.cloudflared.yml` to use Option B (config file) instead of Option A (token).
-
-5. Deploy as normal.
+7. Deploy as normal.
 
 </details>
 

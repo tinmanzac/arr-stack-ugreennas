@@ -1,20 +1,18 @@
-
 services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
 
-    # Option A: Remotely-managed tunnel (routes configured in Cloudflare dashboard)
-    command: tunnel run
-    environment:
-      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    # Config file approach (recommended - supports wildcard routing)
+    command: tunnel --config /home/nonroot/.cloudflared/config.yml run
+    volumes:
+      - ./cloudflared:/home/nonroot/.cloudflared:ro
 
-    # Option B: Locally-managed tunnel (routes in config file - supports wildcards)
-    # Uncomment below and comment out Option A above
-    # command: tunnel --config /etc/cloudflared/config.yml run
-    # volumes:
-    #   - ./cloudflared/config.yml:/etc/cloudflared/config.yml:ro
-    #   - ./cloudflared/credentials.json:/etc/cloudflared/credentials.json:ro
+    # Alternative: Token-based (routes configured in Cloudflare dashboard)
+    # Uncomment below and comment out the command/volumes above
+    # command: tunnel run
+    # environment:
+    #   - TUNNEL_TOKEN=${TUNNEL_TOKEN}
 
     networks:
       traefik-proxy:

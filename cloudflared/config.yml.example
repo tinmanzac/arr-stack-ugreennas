@@ -16,7 +16,7 @@
 #   5. Add DNS records: cloudflared tunnel route dns nas-tunnel *.yourdomain.com
 
 tunnel: YOUR_TUNNEL_ID
-credentials-file: /etc/cloudflared/credentials.json
+credentials-file: /home/nonroot/.cloudflared/credentials.json
 
 ingress:
   # Wildcard catches all subdomains (jellyfin, sonarr, radarr, etc.)

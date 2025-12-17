@@ -146,7 +146,7 @@ Skip the domain and access services directly via IP:port. All services work out 
 
 **Cloudflare Tunnel warning**: Tunnel traffic appears as localhost, bypassing "Disabled for Local Addresses" auth.
 
-See [Security section](docs/SETUP.md#59-security-enable-authentication) in Setup Guide for details.
+See [Security Checklist](docs/SETUP.md#59-security-checklist) in Setup Guide for details.
 
 ## License
 

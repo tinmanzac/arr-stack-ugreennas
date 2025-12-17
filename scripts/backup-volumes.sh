@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Backup all Docker named volumes to a directory
+# Backup essential Docker named volumes
 #
 # Usage:
 #   ./scripts/backup-volumes.sh [OPTIONS] [BACKUP_DIR]
@@ -9,13 +9,13 @@
 #   --tar    Create a .tar.gz archive (easier to transfer off-NAS)
 #
 # Examples:
-#   ./scripts/backup-volumes.sh                           # Backup to /volume1/backups/arr-stack-YYYYMMDD
+#   ./scripts/backup-volumes.sh                           # Backup to /tmp/arr-stack-backup-YYYYMMDD
 #   ./scripts/backup-volumes.sh /path/to/backup           # Backup to custom directory
-#   ./scripts/backup-volumes.sh --tar                     # Create tarball in current directory
+#   ./scripts/backup-volumes.sh --tar                     # Create tarball in /tmp
 #   ./scripts/backup-volumes.sh --tar /path/to/backup     # Create tarball in custom directory
 #
 # To pull backup to local machine:
-#   scp user@nas:/path/to/arr-stack-backup-YYYYMMDD.tar.gz ./backups/
+#   scp user@nas:/tmp/arr-stack-backup-YYYYMMDD.tar.gz ./backups/
 #
 
 set -e
@@ -35,43 +35,46 @@ for arg in "$@"; do
   esac
 done
 
-# Default backup directory
-BACKUP_DIR="${BACKUP_DIR:-/volume1/backups/arr-stack-$(date +%Y%m%d)}"
+# Default to /tmp (writable by all users)
+# Note: /tmp isn't accessible via SCP on Ugreen NAS - use --tar then copy manually
+BACKUP_DIR="${BACKUP_DIR:-/tmp/arr-stack-backup-$(date +%Y%m%d)}"
 mkdir -p "$BACKUP_DIR"
 
-# Volumes to backup (essential configs only)
-# Excludes: jellyfin-cache (regenerates), duc-index (regenerates)
+# Get current user for ownership fix
+CURRENT_UID=$(id -u)
+CURRENT_GID=$(id -g)
+
+# Essential volumes only (small, hard to recreate)
+# Excludes large volumes that can regenerate by re-scanning libraries
 VOLUMES=(
-  # arr-stack.yml
-  arr-stack_gluetun-config
-  arr-stack_qbittorrent-config
-  arr-stack_sonarr-config
-  arr-stack_prowlarr-config
-  arr-stack_radarr-config
-  arr-stack_jellyfin-config
-  arr-stack_jellyseerr-config
-  arr-stack_bazarr-config
-  arr-stack_pihole-etc-pihole
-  arr-stack_pihole-etc-dnsmasq
-  arr-stack_wireguard-easy-config
-  # utilities.yml
-  arr-stack_uptime-kuma-data
+  arr-stack_gluetun-config          # VPN settings
+  arr-stack_qbittorrent-config      # Client settings, categories
+  arr-stack_jellyseerr-config       # User accounts, requests
+  arr-stack_bazarr-config           # Subtitle provider settings
+  arr-stack_prowlarr-config         # Indexer configs
+  arr-stack_wireguard-easy-config   # VPN peer configs (critical!)
+  arr-stack_uptime-kuma-data        # Monitor configs
+  arr-stack_pihole-etc-dnsmasq      # DNS settings (small)
 )
 
-# Optional volumes (uncomment if you want to include them)
-# VOLUMES+=(arr-stack_jellyfin-cache)  # ~43MB, regenerates automatically
-# VOLUMES+=(arr-stack_duc-index)        # ~20MB, regenerates on restart
+# Optional: uncomment to include larger volumes that can regenerate
+# VOLUMES+=(arr-stack_jellyfin-config)    # 407MB - re-scan library to rebuild
+# VOLUMES+=(arr-stack_sonarr-config)      # 43MB  - re-scan library to rebuild
+# VOLUMES+=(arr-stack_radarr-config)      # 110MB - re-scan library to rebuild
+# VOLUMES+=(arr-stack_pihole-etc-pihole)  # 138MB - blocklists re-download automatically
 
 echo "Backing up to: $BACKUP_DIR"
 echo ""
 
 for vol in "${VOLUMES[@]}"; do
   if docker volume inspect "$vol" &>/dev/null; then
+    DEST_NAME="${vol#arr-stack_}"
     echo "Backing up $vol..."
+    # Copy files and fix ownership in one container run
     docker run --rm \
       -v "$vol":/source:ro \
       -v "$BACKUP_DIR":/backup \
-      alpine cp -a /source/. "/backup/${vol#arr-stack_}/"
+      alpine sh -c "cp -a /source/. /backup/$DEST_NAME/ && chown -R $CURRENT_UID:$CURRENT_GID /backup/$DEST_NAME"
   else
     echo "Skipping $vol (not found)"
   fi
@@ -79,6 +82,7 @@ done
 
 echo ""
 echo "Backup complete: $BACKUP_DIR"
+du -sh "$BACKUP_DIR"
 
 # Create tarball if requested
 if [ "$CREATE_TAR" = true ]; then

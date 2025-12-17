@@ -94,6 +94,7 @@ Ask Claude to help deploy the stack - it reads [`.claude/instructions.md`](.clau
 | **deunhealth** | Auto-restart services if VPN drops and recovers | - | Internal |
 | **Uptime Kuma** | Service monitoring dashboard | http://NAS_IP:3001 | Via WireGuard |
 | **duc** | Disk usage analyzer (treemap UI) | http://NAS_IP:8838 | Via WireGuard |
+| **qbit-scheduler** | Pauses torrents overnight (20:00-06:00) for disk spin-down | - | Internal |
 
 ## Deployment Options
 

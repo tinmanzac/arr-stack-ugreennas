@@ -101,3 +101,20 @@ services:
       - SCHEDULE=0 4 * * *             # Re-index daily at 4am
     restart: unless-stopped
     logging: *default-logging
+
+  #############################################
+  # qBittorrent Scheduler                     #
+  #############################################
+  # Pauses all torrents at 20:00, resumes at 06:00
+  # Allows NAS disks to spin down overnight
+  qbit-scheduler:
+    build: ./scripts/qbit-scheduler
+    container_name: qbit-scheduler
+    environment:
+      - TZ=${TZ:-Europe/London}
+      - QBIT_HOST=${NAS_IP:-192.168.1.100}
+      - QBIT_PORT=8085
+      - QBIT_USER=${QBIT_USER:-admin}
+      - QBIT_PASS=${QBIT_PASSWORD}
+    restart: unless-stopped
+    logging: *default-logging

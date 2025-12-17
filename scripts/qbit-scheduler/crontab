@@ -1,0 +1,5 @@
+# Pause all torrents at 20:00 (8pm)
+0 20 * * * /app/pause-resume.sh pause >> /proc/1/fd/1 2>&1
+
+# Resume all torrents at 06:00 (6am)
+0 6 * * * /app/pause-resume.sh resume >> /proc/1/fd/1 2>&1

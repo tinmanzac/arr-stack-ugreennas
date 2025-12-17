@@ -14,15 +14,12 @@ This project provides configuration files for **legal, open-source software** de
 
 ## Getting Started
 
-**Two ways to deploy this stack:**
-
-- **Manual setup** - Follow the [Quick Start](#quick-start) below and the [docs/](docs/) folder
-- **Guided setup with Claude Code** - AI walks you through it interactively (see below)
+**[Setup Guide](docs/SETUP.md)** - Complete step-by-step instructions for deployment.
 
 <details>
-<summary>Using Claude Code for guided setup</summary>
+<summary>Using Claude Code for guided setup (optional)</summary>
 
-[Claude Code](https://claude.ai/claude-code) can read the setup guides and walk you through deployment step-by-step, executing commands and troubleshooting as you go.
+[Claude Code](https://claude.ai/claude-code) can walk you through deployment step-by-step, executing commands and troubleshooting as you go.
 
 ```bash
 npm install -g @anthropic-ai/claude-code
@@ -106,54 +103,6 @@ Skip the domain and access services directly via IP:port. All services work out 
 2. Deploy: `docker compose -f docker-compose.arr-stack.yml up -d`
 3. Access via `http://NAS_IP:PORT`
 
----
-
-## Quick Start
-
-> The instructions below assume **Option A (with domain)**. For local-only, see above.
-
-### Prerequisites
-
-- Ugreen NAS DXP4800+ (tested) or compatible Docker-capable NAS device
-- Domain name (any registrar)
-- Cloudflare account (free) - or modify configs for your DNS provider
-- VPN subscription (configured for Surfshark, [30+ others supported](https://github.com/qdm12/gluetun-wiki/tree/main/setup/providers))
-
-### Installation
-
-1. **Clone repository**:
-   ```bash
-   git clone https://github.com/yourusername/arr-stack-ugreennas.git
-   cd arr-stack-ugreennas
-   ```
-
-2. **Configure environment**:
-   ```bash
-   cp .env.example .env
-   nano .env
-   ```
-   Fill in your domain, API tokens, and credentials.
-
-3. **Set up DNS** (see [DNS Setup Guide](docs/DNS-SETUP.md))
-
-4. **Deploy Traefik**:
-   ```bash
-   docker compose -f docker-compose.traefik.yml up -d
-   ```
-
-5. **Deploy media stack**:
-   ```bash
-   docker compose -f docker-compose.arr-stack.yml up -d
-   ```
-
-## Documentation
-
-📖 **Complete documentation in the [`docs/`](docs/) folder**:
-
-- **[Ugreen NAS Setup Guide](docs/README-UGREEN.md)** - Complete setup guide for new users
-- **[Deployment Plan](docs/DEPLOYMENT-PLAN.md)** - Step-by-step deployment checklist
-- **[DNS Setup Guide](docs/DNS-SETUP.md)** - Cloudflare DNS configuration
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
 
 ## Documentation Strategy
 
@@ -187,12 +136,9 @@ arr-stack-ugreennas/          # Git repo (source of truth)
 │       └── vpn-services-plex.yml   # Service routing (Plex variant)
 ├── .env.example                    # Environment template
 ├── .env                            # Your configuration (gitignored)
-├── docs/                           # Documentation (git repo only)
-│   ├── README-UGREEN.md
-│   ├── DEPLOYMENT-PLAN.md
-│   ├── DNS-SETUP.md
-│   ├── SERVICE-CONFIGURATION.md
-│   └── TROUBLESHOOTING.md
+├── docs/                           # Documentation
+│   ├── SETUP.md                    # Complete setup guide
+│   └── LEGAL.md                    # Legal notice
 ├── .claude/
 │   ├── instructions.md             # AI assistant instructions (tracked)
 │   ├── config.local.md.example     # Private config template (tracked)
@@ -251,8 +197,6 @@ This project uses **three separate Docker Compose files** (not one):
 
 **Deployment order matters**: Deploy Traefik first (creates network), then cloudflared, then arr-stack.
 
-See [Architecture section in README-UGREEN.md](docs/README-UGREEN.md#why-three-separate-docker-compose-files) for detailed explanation.
-
 ### Storage Structure
 
 ```
@@ -295,33 +239,6 @@ TRAEFIK_DASHBOARD_AUTH=htpasswd_hash_here
 
 See [`.env.example`](.env.example) for complete configuration.
 
-## Deployment
-
-For detailed deployment instructions, see:
-- **[Deployment Plan](docs/DEPLOYMENT-PLAN.md)** - Step-by-step guide
-- **[README-UGREEN.md](docs/README-UGREEN.md)** - Complete setup for new users
-
-### Quick Deploy
-
-```bash
-# 1. Create Docker network
-docker network create \
-  --driver=bridge \
-  --subnet=192.168.100.0/24 \
-  --gateway=192.168.100.1 \
-  traefik-proxy
-
-# 2. Deploy Traefik (creates SSL certs)
-docker compose -f docker-compose.traefik.yml up -d
-
-# 3. Deploy Cloudflare Tunnel (for remote access)
-docker compose -f docker-compose.cloudflared.yml up -d
-
-# 4. Deploy media stack (health checks handle startup order)
-docker compose -f docker-compose.arr-stack.yml up -d
-```
-
-> **Note**: VPN-dependent services (Sonarr, Radarr, etc.) automatically wait for Gluetun to be healthy before starting.
 
 ## Updating
 
@@ -350,7 +267,7 @@ docker run --rm \
 
 ## Troubleshooting
 
-Having issues? Check the **[Troubleshooting Guide](docs/TROUBLESHOOTING.md)**.
+Having issues? Check the [Troubleshooting section](docs/SETUP.md#troubleshooting) in the Setup Guide.
 
 Common issues:
 - VPN not connecting → Check VPN credentials in `.env`
@@ -378,7 +295,7 @@ Common issues:
 
 **Why this matters with Cloudflare Tunnel**: Traffic through the tunnel appears to come from localhost, bypassing "Disabled for Local Addresses" authentication!
 
-See [Phase 9: Security Configuration](docs/DEPLOYMENT-PLAN.md#phase-9-security-configuration) for detailed instructions.
+See the [Security section](docs/SETUP.md#59-security-enable-authentication) in the Setup Guide for detailed instructions.
 
 ## Customization
 
@@ -403,7 +320,7 @@ See [Gluetun providers](https://github.com/qdm12/gluetun-wiki/tree/main/setup/pr
 
 ## Support & Resources
 
-- **Documentation**: [`docs/`](docs/) folder
+- **Setup Guide**: [docs/SETUP.md](docs/SETUP.md)
 - **Gluetun**: https://github.com/qdm12/gluetun
 - **Traefik**: https://doc.traefik.io/
 - **Servarr Wiki**: https://wiki.servarr.com/
@@ -443,4 +360,4 @@ Official documentation for included software:
 
 ---
 
-**Need help?** Start with the [README-UGREEN.md](docs/README-UGREEN.md) guide or check [Troubleshooting](docs/TROUBLESHOOTING.md).
+**Need help?** Start with the [Setup Guide](docs/SETUP.md).

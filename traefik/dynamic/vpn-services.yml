@@ -60,19 +60,8 @@ http:
         - web
       service: uptime
 
-    traefik-dashboard:
-      rule: "Host(`traefik.yourdomain.com`)"
-      entryPoints:
-        - web
-      service: api@internal
-      middlewares:
-        - dashboard-auth
-
-  middlewares:
-    dashboard-auth:
-      basicAuth:
-        users:
-          - "admin:$2y$05$MAxBsKrzpgBxt8PMBZ.fcujzfVOqJa8MzlbUyfKMTHIewJ/u7v3u."
+    # NOTE: traefik-dashboard is configured via docker-compose.traefik.yml labels
+    # (using ${TRAEFIK_DASHBOARD_AUTH} env var for auth - not possible in dynamic configs)
 
   services:
     sonarr:

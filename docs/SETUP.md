@@ -352,6 +352,18 @@ domains:
 email: admin@yourdomain.com   # ← your email
 ```
 
+Also edit `traefik/dynamic/vpn-services.yml` (or `vpn-services-plex.yml` for Plex) and replace the Host rules:
+
+```yaml
+# Replace yourdomain.com with your actual domain
+jellyfin:
+  rule: "Host(`jellyfin.yourdomain.com`)"  # ← your domain
+jellyseerr:
+  rule: "Host(`jellyseerr.yourdomain.com`)"  # ← your domain
+wg:
+  rule: "Host(`wg.yourdomain.com`)"  # ← your domain
+```
+
 ---
 
 ## Step 4: Deploy Services

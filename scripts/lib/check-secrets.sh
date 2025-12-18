@@ -1,19 +1,27 @@
 #!/bin/bash
 # Secret detection for pre-commit hook
-# Detects real secrets vs placeholders in staged files
+# Scans ALL tracked files in repo (not just staged) for security
 
 check_secrets() {
     local errors=0
 
-    # Get staged files (excluding deleted files)
+    # Check both staged files AND all tracked files in the repo
+    # This ensures we catch secrets even if commits slipped through before
     local staged_files
     staged_files=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null)
 
-    if [[ -z "$staged_files" ]]; then
+    local all_tracked_files
+    all_tracked_files=$(git ls-files 2>/dev/null)
+
+    # Combine and deduplicate
+    local files_to_check
+    files_to_check=$(echo -e "$staged_files\n$all_tracked_files" | sort -u | grep -v '^$')
+
+    if [[ -z "$files_to_check" ]]; then
         return 0
     fi
 
-    for file in $staged_files; do
+    for file in $files_to_check; do
         # Skip binary files, .env, and the check scripts themselves (contain example patterns)
         case "$file" in
             *.png|*.jpg|*.gif|*.ico|*.woff|*.woff2|*.ttf|*.eot) continue ;;
@@ -22,9 +30,9 @@ check_secrets() {
             *.md) continue ;;  # Documentation may contain examples
         esac
 
-        # Get staged content (what will actually be committed)
+        # Get file content (read actual file, not just staged version)
         local content
-        content=$(git show ":$file" 2>/dev/null) || continue
+        content=$(cat "$file" 2>/dev/null) || continue
 
         # Pattern 1: WireGuard private key (44-char base64 ending in =)
         # Real: oK7kZv8RGqDN2P0LT0w9D4xXU7MkL5R3tN6Y8W2B1C4=

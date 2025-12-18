@@ -7,8 +7,22 @@ check_env_backup() {
     repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || repo_root="."
 
     local backup_file="$repo_root/.env.nas.backup"
-    local nas_host="yournas.local"
-    local nas_user="admin"
+    local config_local="$repo_root/.claude/config.local.md"
+
+    # Read NAS host from config.local.md (expects "hostname.local" format)
+    local nas_host=""
+    local nas_user=""
+    if [[ -f "$config_local" ]]; then
+        nas_host=$(grep -oE '[a-zA-Z0-9_-]+\.local' "$config_local" 2>/dev/null | head -1)
+        nas_user=$(grep -oE 'SSH:\s*[a-zA-Z0-9_-]+@' "$config_local" 2>/dev/null | sed 's/SSH:\s*//' | sed 's/@$//' | head -1)
+    fi
+
+    # Skip if config not found
+    if [[ -z "$nas_host" ]]; then
+        echo "    SKIP: No NAS host in .claude/config.local.md"
+        return 0
+    fi
+    [[ -z "$nas_user" ]] && nas_user="admin"  # Default user
 
     # Skip if no backup file
     if [[ ! -f "$backup_file" ]]; then
@@ -54,7 +68,7 @@ check_env_backup() {
 
     if [[ "$nas_env" != "$local_env" ]]; then
         echo "    WARNING: .env.nas.backup differs from NAS .env"
-        echo "             Run: scp admin@yournas.local:/volume1/docker/arr-stack/.env .env.nas.backup"
+        echo "             Run: scp $nas_user@$nas_host:/volume1/docker/arr-stack/.env .env.nas.backup"
         return 0  # Warning only, don't block
     fi
 

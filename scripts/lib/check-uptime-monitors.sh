@@ -23,9 +23,21 @@ check_uptime_monitors() {
         "WireGuard"
     )
 
-    # Try to get NAS host from config.local.md or use default
-    local nas_host="yournas.local"
-    local nas_user="admin"
+    # Read NAS host from config.local.md (expects "hostname.local" format)
+    local config_local="$repo_root/.claude/config.local.md"
+    local nas_host=""
+    local nas_user=""
+    if [[ -f "$config_local" ]]; then
+        nas_host=$(grep -oE '[a-zA-Z0-9_-]+\.local' "$config_local" 2>/dev/null | head -1)
+        nas_user=$(grep -oE 'SSH:\s*[a-zA-Z0-9_-]+@' "$config_local" 2>/dev/null | sed 's/SSH:\s*//' | sed 's/@$//' | head -1)
+    fi
+
+    # Skip if config not found
+    if [[ -z "$nas_host" ]]; then
+        echo "    SKIP: No NAS host in .claude/config.local.md"
+        return 0
+    fi
+    [[ -z "$nas_user" ]] && nas_user="admin"  # Default user
 
     # Check if NAS is reachable (quick ping, 1 second timeout)
     if ! ping -c 1 -W 1 "$nas_host" &>/dev/null 2>&1; then

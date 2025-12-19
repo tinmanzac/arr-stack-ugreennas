@@ -97,6 +97,7 @@ Ask Claude to help deploy the stack - it reads [`.claude/instructions.md`](.clau
 |---------|-------------|-------|
 | **Gluetun** | VPN gateway for network privacy | - |
 | **qBittorrent** | BitTorrent client (VueTorrent UI) | NAS_IP:8085 |
+| **SABnzbd** | Usenet download client | NAS_IP:8082 |
 | **Sonarr** | TV show library management | NAS_IP:8989 |
 | **Radarr** | Movie library management | NAS_IP:7878 |
 | **Prowlarr** | Search aggregator | NAS_IP:9696 |

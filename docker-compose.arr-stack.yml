@@ -5,6 +5,7 @@
 volumes:
   gluetun-config:
   qbittorrent-config:
+  sabnzbd-config:
   sonarr-config:
   prowlarr-config:
   radarr-config:
@@ -114,6 +115,33 @@ services:
       interval: 1m30s
       timeout: 10s
       retries: 3
+
+  #############################################
+  # Usenet Download Client (SABnzbd)         #
+  #############################################
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    ports:
+      - "8082:8080"  # Web UI (local network access)
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-Europe/London}
+    volumes:
+      - sabnzbd-config:/config
+      - ${MEDIA_ROOT:-/volume1/Media}/downloads:/downloads
+      - ${MEDIA_ROOT:-/volume1/Media}/downloads/incomplete:/incomplete-downloads
+    networks:
+      traefik-proxy:
+        ipv4_address: 192.168.100.14
+    restart: unless-stopped
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 3m
+      timeout: 10s
+      retries: 2
 
   #############################################
   # TV Show Management (Sonarr via VPN)      #

@@ -35,6 +35,12 @@ Complete setup guide for the media automation stack. Works on any Docker host wi
 ### Required Services
 - **VPN Subscription** - Any provider supported by [Gluetun](https://github.com/qdm12/gluetun-wiki/tree/main/setup/providers) (Surfshark, NordVPN, PIA, Mullvad, ProtonVPN, etc.)
 
+### For Usenet downloads (optional but recommended)
+- **Usenet Provider** (~$4-6/month) - Frugal Usenet, Newshosting, Eweka, etc.
+- **Usenet Indexer** - NZBGeek (~$12/year) or DrunkenSlug (free tier)
+
+> **Why Usenet?** More reliable than public torrents (no fakes), faster downloads, SSL-encrypted (no VPN needed). See [SABnzbd setup](#55-sabnzbd-usenet-downloads-optional).
+
 ### For remote access (optional)
 - **Domain Name** (~$8-10/year)
 - **Cloudflare Account** (free tier)
@@ -468,41 +474,97 @@ docker exec gluetun wget -qO- ifconfig.me
    - `sonarr` → Save path: `/downloads/sonarr`
    - `radarr` → Save path: `/downloads/radarr`
 
-### 5.2 Prowlarr (Indexer Manager)
+### 5.2 SABnzbd (Usenet Downloads) - Optional
+
+Skip this if you only want torrents. SABnzbd provides Usenet downloads as an alternative/complement to qBittorrent.
+
+1. **Access:** `http://HOST_IP:8082`
+2. **Run Quick-Start Wizard** with your Usenet provider details:
+
+   **Popular providers:**
+   | Provider | Price | Server |
+   |----------|-------|--------|
+   | Frugal Usenet | $4/mo | `news.frugalusenet.com` |
+   | Newshosting | $6/mo | `news.newshosting.com` |
+   | Eweka | €4/mo | `news.eweka.nl` |
+
+   **Wizard settings:**
+   - Host: (from table above)
+   - Username: (your account email)
+   - Password: (your account password)
+   - SSL: ✓ checked
+   - Click **Advanced Settings**:
+     - Port: `563`
+     - Connections: `20-60` (depends on plan)
+   - Click **Test Server** → **Next**
+
+3. **Get API Key:** After wizard, go to Config (⚙️) → General → Copy **API Key**
+
+4. **Add Usenet indexer to Prowlarr** (next section):
+   - NZBGeek ($12/year): https://nzbgeek.info
+   - DrunkenSlug (free tier): https://drunkenslug.com
+
+### 5.3 Prowlarr (Indexer Manager)
 
 1. **Access:** `http://HOST_IP:9696`
 2. **Add Indexers:** Settings → Indexers → Add Indexer
-3. **Add FlareSolverr** (for protected sites):
+3. **Add Usenet Indexer** (if using SABnzbd):
+   - Settings → Indexers → Add Indexer → Search "Newznab"
+   - Select generic "Newznab" (works for NZBGeek, DrunkenSlug, etc.)
+   - URL: `https://nzbgeek.info` or `https://drunkenslug.com`
+   - API Key: (from your indexer account profile page)
+   - Test → Save
+4. **Add FlareSolverr** (for protected torrent sites):
    - Settings → Indexers → Add FlareSolverr
    - Host: `http://flaresolverr:8191` (or `http://192.168.100.10:8191` if hostname fails)
    - Tag: `flaresolverr`
    - **Note:** FlareSolverr doesn't bypass all Cloudflare protections - some indexers may still fail. Non-protected indexers are more reliable.
-4. **Connect to Sonarr:**
+5. **Connect to Sonarr:**
    - Settings → Apps → Add → Sonarr
    - Sonarr Server: `http://localhost:8989` (they share gluetun's network)
    - API Key: (from Sonarr → Settings → General → Security)
 5. **Connect to Radarr:** Same process with `http://localhost:7878`
 6. **Sync:** Settings → Apps → Sync App Indexers
 
-### 5.3 Sonarr (TV Shows)
+### 5.4 Sonarr (TV Shows)
 
 1. **Access:** `http://HOST_IP:8989`
 2. **Add Root Folder:** Settings → Media Management → `/tv`
-3. **Add Download Client:** Settings → Download Clients → qBittorrent
+3. **Add Download Client(s):** Settings → Download Clients
+
+   **qBittorrent (torrents):**
+   - Add → qBittorrent
    - Host: `localhost` (Sonarr & qBittorrent share gluetun's network)
    - Port: `8085`
    - Category: `sonarr`
 
-### 5.4 Radarr (Movies)
+   **SABnzbd (Usenet):** *(if configured)*
+   - Add → SABnzbd
+   - Host: `192.168.100.14` (Sonarr can't resolve hostnames - it runs via gluetun)
+   - Port: `8080`
+   - API Key: (from SABnzbd Config → General)
+   - Category: `tv`
+
+### 5.5 Radarr (Movies)
 
 1. **Access:** `http://HOST_IP:7878`
 2. **Add Root Folder:** Settings → Media Management → `/movies`
-3. **Add Download Client:** Settings → Download Clients → qBittorrent
+3. **Add Download Client(s):** Settings → Download Clients
+
+   **qBittorrent (torrents):**
+   - Add → qBittorrent
    - Host: `localhost` (Radarr & qBittorrent share gluetun's network)
    - Port: `8085`
    - Category: `radarr`
 
-### 5.5 Jellyfin (Media Server)
+   **SABnzbd (Usenet):** *(if configured)*
+   - Add → SABnzbd
+   - Host: `192.168.100.14` (Radarr can't resolve hostnames - it runs via gluetun)
+   - Port: `8080`
+   - API Key: (from SABnzbd Config → General)
+   - Category: `movies`
+
+### 5.6 Jellyfin (Media Server)
 
 1. **Access:** `http://HOST_IP:8096`
 2. **Initial Setup:** Create admin account
@@ -510,7 +572,7 @@ docker exec gluetun wget -qO- ifconfig.me
    - Movies: Content type "Movies", Folder `/media/movies`
    - TV Shows: Content type "Shows", Folder `/media/tv`
 
-### 5.6 Jellyseerr (Request Manager)
+### 5.7 Jellyseerr (Request Manager)
 
 1. **Access:** `http://HOST_IP:5055`
 2. **Sign in with Jellyfin:**
@@ -520,7 +582,7 @@ docker exec gluetun wget -qO- ifconfig.me
    - Settings → Services → Add Sonarr: `http://gluetun:8989` (Sonarr runs via gluetun)
    - Settings → Services → Add Radarr: `http://gluetun:7878` (Radarr runs via gluetun)
 
-### 5.7 Bazarr (Subtitles)
+### 5.8 Bazarr (Subtitles)
 
 1. **Access:** `http://HOST_IP:6767`
 2. **Enable Authentication:** Settings → General → Security → Forms
@@ -528,7 +590,7 @@ docker exec gluetun wget -qO- ifconfig.me
 4. **Connect to Radarr:** Settings → Radarr → `http://gluetun:7878` (Radarr runs via gluetun)
 5. **Add Providers:** Settings → Providers (OpenSubtitles, etc.)
 
-### 5.8 Pi-hole (DNS/Ad-blocking)
+### 5.9 Pi-hole (DNS/Ad-blocking)
 
 1. **Access:** `http://HOST_IP:8081/admin`
 2. **Login:** Use password from `PIHOLE_UI_PASS` (password only, no username)

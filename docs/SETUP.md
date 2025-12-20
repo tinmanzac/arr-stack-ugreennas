@@ -500,9 +500,16 @@ Skip this if you only want torrents. SABnzbd provides Usenet downloads as an alt
      - Connections: `20-60` (depends on plan)
    - Click **Test Server** → **Next**
 
-3. **Get API Key:** After wizard, go to Config (⚙️) → General → Copy **API Key**
+3. **Configure Folders:** Config (⚙️) → Folders → set **absolute paths**:
+   - **Temporary Download Folder:** `/incomplete-downloads`
+   - **Completed Download Folder:** `/downloads`
+   - Save Changes
 
-4. **Add Usenet indexer to Prowlarr** (next section):
+   > **Important:** Don't use relative paths like `Downloads/complete` - Sonarr/Radarr won't find them.
+
+4. **Get API Key:** Config (⚙️) → General → Copy **API Key**
+
+5. **Add Usenet indexer to Prowlarr** (next section):
    - NZBGeek ($12/year): https://nzbgeek.info
    - DrunkenSlug (free tier): https://drunkenslug.com
 

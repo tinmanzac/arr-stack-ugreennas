@@ -16,7 +16,7 @@
 | Jellyseerr | 192.168.100.8 | 5055 | Request management |
 | Bazarr | 192.168.100.9 | 6767 | Subtitles |
 | FlareSolverr | 192.168.100.10 | 8191 | Cloudflare bypass |
-| SABnzbd | 192.168.100.14 | 8082 | Usenet downloads |
+| ↳ SABnzbd | (via Gluetun) | 8082 | Usenet downloads (VPN) |
 
 **Optional** (utilities.yml / cloudflared.yml):
 
@@ -42,8 +42,8 @@
 | Jellyseerr | Jellyfin | `jellyfin:8096` | Both have own IPs |
 | Bazarr | Sonarr | `gluetun:8989` | Must go through gluetun |
 | Bazarr | Radarr | `gluetun:7878` | Must go through gluetun |
-| Sonarr | SABnzbd | `192.168.100.14:8080` | Use IP (gluetun can't resolve hostname) |
-| Radarr | SABnzbd | `192.168.100.14:8080` | Use IP (gluetun can't resolve hostname) |
+| Sonarr | SABnzbd | `localhost:8080` | Same network stack |
+| Radarr | SABnzbd | `localhost:8080` | Same network stack |
 
 > **Why `gluetun` not `sonarr`?** Services sharing gluetun's network don't get their own Docker DNS entries. Jellyseerr/Bazarr must use `gluetun` hostname (or `192.168.100.3`) to reach them.
 

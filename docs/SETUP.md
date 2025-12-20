@@ -478,6 +478,8 @@ docker exec gluetun wget -qO- ifconfig.me
 
 Skip this if you only want torrents. SABnzbd provides Usenet downloads as an alternative/complement to qBittorrent.
 
+> **Why route Usenet through VPN?** Usenet uses SSL encryption, so your ISP can't see *what* you download. But they can see you're connecting to a Usenet provider. Routing through VPN hides even that - only your VPN provider (Surfshark) sees the connection. Belt and suspenders.
+
 1. **Access:** `http://HOST_IP:8082`
 2. **Run Quick-Start Wizard** with your Usenet provider details:
 
@@ -540,7 +542,7 @@ Skip this if you only want torrents. SABnzbd provides Usenet downloads as an alt
 
    **SABnzbd (Usenet):** *(if configured)*
    - Add → SABnzbd
-   - Host: `192.168.100.14` (Sonarr can't resolve hostnames - it runs via gluetun)
+   - Host: `localhost` (SABnzbd also runs via gluetun)
    - Port: `8080`
    - API Key: (from SABnzbd Config → General)
    - Category: `tv`
@@ -559,7 +561,7 @@ Skip this if you only want torrents. SABnzbd provides Usenet downloads as an alt
 
    **SABnzbd (Usenet):** *(if configured)*
    - Add → SABnzbd
-   - Host: `192.168.100.14` (Radarr can't resolve hostnames - it runs via gluetun)
+   - Host: `localhost` (SABnzbd also runs via gluetun)
    - Port: `8080`
    - API Key: (from SABnzbd Config → General)
    - Category: `movies`

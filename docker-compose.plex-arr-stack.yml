@@ -85,6 +85,7 @@ services:
       - "7878:7878"   # Radarr
       - "9696:9696"   # Prowlarr
       - "8085:8085"   # qBittorrent
+      - "8082:8080"   # SABnzbd
     networks:
       traefik-proxy:
         ipv4_address: 192.168.100.3
@@ -128,13 +129,15 @@ services:
       retries: 3
 
   #############################################
-  # Usenet Download Client (SABnzbd)         #
+  # Usenet Download Client (SABnzbd via VPN) #
   #############################################
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
-    ports:
-      - "8082:8080"  # Web UI (local network access)
+    network_mode: "service:gluetun"
+    depends_on:
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -143,9 +146,8 @@ services:
       - sabnzbd-config:/config
       - ${MEDIA_ROOT:-/volume1/Media}/downloads:/downloads
       - ${MEDIA_ROOT:-/volume1/Media}/downloads/incomplete:/incomplete-downloads
-    networks:
-      traefik-proxy:
-        ipv4_address: 192.168.100.14
+    labels:
+      - deunhealth.restart.on.unhealthy=true
     restart: unless-stopped
     logging: *default-logging
     healthcheck:

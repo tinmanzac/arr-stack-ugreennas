@@ -199,16 +199,26 @@ UGOS handles automatic updates natively (no Watchtower needed):
 
 ## Backups
 
+### Prerequisites
+
+**USB drive mounted at `/mnt/arr-backup`** for automated backups. Without it, backups stay in `/tmp` (cleared on reboot).
+
 ### Automated Daily Backup (6am)
 
-Cron runs daily at 6am, backing up essential configs to USB drive:
+Cron runs daily at 6am:
 ```
 0 6 * * * /volume1/docker/arr-stack/scripts/backup-volumes.sh --tar /mnt/arr-backup >> /var/log/arr-backup.log 2>&1
 ```
 
-**Location:** `/mnt/arr-backup/arr-stack-backup-YYYYMMDD.tar.gz`
+**How it works:**
+1. Creates backup in `/tmp` first (reliable space)
+2. Creates tarball (~13MB)
+3. Checks actual tarball size vs USB space
+4. Moves to USB only if space available
+5. Falls back to `/tmp` with warning if USB full
+6. EXIT trap ensures services stay running no matter what
 
-**Does NOT stop services** - safe live backup.
+**Does NOT stop services** - safe live backup. Keeps 7 days on USB.
 
 ### Manual Backup / Pull to Local
 
@@ -225,7 +235,7 @@ ssh <user>@<nas-host> "cat /mnt/arr-backup/arr-stack-backup-*.tar.gz" > backups/
 
 ### What's Backed Up
 
-**Included** (~12MB compressed): gluetun, qbittorrent, prowlarr, bazarr, wireguard, uptime-kuma, pihole-dnsmasq, jellyseerr configs.
+**Included** (~13MB compressed): gluetun, qbittorrent, prowlarr, bazarr, wireguard, uptime-kuma, pihole-dnsmasq, jellyseerr, sabnzbd configs.
 
 **Excluded** (regeneratable): jellyfin-config (407MB), sonarr (43MB), radarr (110MB), pihole blocklists (138MB).
 

@@ -114,6 +114,7 @@ CURRENT_GID=$(id -g)
 VOLUME_SUFFIXES=(
   gluetun-config          # VPN provider credentials and settings
   qbittorrent-config      # Client settings, categories, watched folders
+  sabnzbd-config          # Usenet provider credentials and settings
   prowlarr-config         # Indexer configs and API keys
   bazarr-config           # Subtitle provider credentials
   wireguard-easy-config   # VPN peer configs - CRITICAL for remote access!

@@ -2,6 +2,20 @@
 
 This stack uses Docker named volumes for service data. This guide covers backing up and restoring your configuration.
 
+## Prerequisites
+
+**USB Drive for Automated Backups (Recommended)**
+
+For the automated daily backup to work, plug a USB drive into your NAS:
+
+1. **Format** the USB drive (ext4 recommended, FAT32 works but has file size limits)
+2. **Mount** it at `/mnt/arr-backup` (or update the cron job path)
+3. The script will automatically keep 7 days of backups and rotate old ones
+
+> Without a USB drive, backups go to `/tmp` which is cleared on reboot. You'd need to manually pull backups off-NAS.
+
+---
+
 ## What Gets Backed Up
 
 The backup script (`scripts/backup-volumes.sh`) backs up **essential configs only** - small files that are hard to recreate:
@@ -153,13 +167,30 @@ The script auto-detects which variant you're using and backs up the appropriate 
 
 ---
 
-## Backup Schedule
+## Automated Daily Backup
 
-Consider setting up automated backups with cron:
+A cron job runs daily at 6am, backing up to USB:
 
 ```bash
-# Weekly backup, keep for 30 days
-0 3 * * 0 /volume1/docker/arr-stack/scripts/backup-volumes.sh --tar /volume1/backups/arr-stack-$(date +\%Y\%m\%d) && find /volume1/backups -name "arr-stack-*.tar.gz" -mtime +30 -delete
+# View current cron
+sudo crontab -l
+
+# Default schedule (already configured):
+0 6 * * * /volume1/docker/arr-stack/scripts/backup-volumes.sh --tar /mnt/arr-backup >> /var/log/arr-backup.log 2>&1
+```
+
+**Features:**
+- ✓ Backs up to `/tmp` first (reliable), then moves to USB
+- ✓ Checks actual tarball size vs destination space before moving
+- ✓ Falls back to `/tmp` if USB lacks space (with warning)
+- ✓ Keeps 7 days of backups on USB, auto-rotates old ones
+- ✓ EXIT trap ensures critical services stay running no matter what
+- ✓ Does NOT stop services during backup
+
+**To modify the schedule:**
+```bash
+sudo crontab -e
+# Change "0 6" to preferred hour (e.g., "0 4" for 4am)
 ```
 
 ---

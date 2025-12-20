@@ -28,6 +28,28 @@
 
 # Don't use set -e as arithmetic operations can return non-zero
 
+# Ensure critical services are running on ANY exit (normal, error, or interrupt)
+ensure_services_running() {
+  COMPOSE_FILE="/volume1/docker/arr-stack/docker-compose.arr-stack.yml"
+  [ -f "$COMPOSE_FILE" ] || return 0
+
+  CRITICAL="gluetun pihole sonarr radarr prowlarr qbittorrent jellyfin sabnzbd"
+  STOPPED=""
+
+  for svc in $CRITICAL; do
+    if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "^${svc}$"; then
+      STOPPED="$STOPPED $svc"
+    fi
+  done
+
+  if [ -n "$STOPPED" ]; then
+    echo ""
+    echo "SAFETY: Ensuring services are running:$STOPPED"
+    docker compose -f "$COMPOSE_FILE" up -d $STOPPED 2>/dev/null
+  fi
+}
+trap ensure_services_running EXIT
+
 # Parse arguments
 CREATE_TAR=false
 BACKUP_DIR=""
@@ -73,12 +95,13 @@ fi
 # Note: /tmp is cleared on reboot - copy tarball off-NAS promptly!
 BACKUP_DIR="${BACKUP_DIR:-/tmp/arr-stack-backup-$(date +%Y%m%d)}"
 
-# Check available space (need at least 100MB for safety)
+# Check available space (warn if low, but continue anyway)
 BACKUP_PARENT=$(dirname "$BACKUP_DIR")
 AVAILABLE_MB=$(df -m "$BACKUP_PARENT" 2>/dev/null | awk 'NR==2 {print $4}')
-if [ -n "$AVAILABLE_MB" ] && [ "$AVAILABLE_MB" -lt 100 ]; then
-  echo "ERROR: Not enough space on $BACKUP_PARENT (${AVAILABLE_MB}MB available, need 100MB)"
-  exit 1
+if [ -n "$AVAILABLE_MB" ] && [ "$AVAILABLE_MB" -lt 200 ]; then
+  echo "WARNING: Low space on $BACKUP_PARENT (${AVAILABLE_MB}MB available)"
+  echo "         Backup may fail if space runs out"
+  echo ""
 fi
 
 mkdir -p "$BACKUP_DIR"
@@ -198,26 +221,7 @@ if [ "$CREATE_TAR" = true ]; then
   echo "  scp user@nas:$TARBALL ./backup.tar.gz"
 fi
 
-# Safety check: ensure critical services are running (defensive - backup shouldn't stop them, but just in case)
-COMPOSE_FILE="/volume1/docker/arr-stack/docker-compose.arr-stack.yml"
-if [ -f "$COMPOSE_FILE" ]; then
-  CRITICAL_SERVICES="gluetun pihole sonarr radarr prowlarr qbittorrent jellyfin"
-  STOPPED_SERVICES=""
-
-  for svc in $CRITICAL_SERVICES; do
-    if ! docker ps --format '{{.Names}}' | grep -q "^${svc}$"; then
-      STOPPED_SERVICES="$STOPPED_SERVICES $svc"
-    fi
-  done
-
-  if [ -n "$STOPPED_SERVICES" ]; then
-    echo ""
-    echo "WARNING: Some services not running:$STOPPED_SERVICES"
-    echo "Attempting to start them..."
-    docker compose -f "$COMPOSE_FILE" up -d $STOPPED_SERVICES 2>/dev/null
-    echo "Services restarted."
-  fi
-fi
+# Safety check runs via EXIT trap (ensure_services_running)
 
 echo ""
 echo "NOTE: Backup is in /tmp which is cleared on reboot."

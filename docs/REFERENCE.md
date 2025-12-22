@@ -26,6 +26,16 @@
 | Uptime Kuma | 192.168.100.13 | 3001 | Monitoring |
 | duc | — | 8838 | Disk usage (no static IP) |
 
+### External Access (internet-exposed via Cloudflare Tunnel)
+
+| URL | Service | Auth |
+|-----|---------|------|
+| `https://jellyfin.${DOMAIN}` | Jellyfin | ✅ Built-in |
+| `https://jellyseerr.${DOMAIN}` | Jellyseerr | ✅ Built-in |
+| `https://wg.${DOMAIN}` | WireGuard | ✅ Password |
+
+All other services are **LAN-only** (not exposed to internet).
+
 ### Local Access (.lan domains)
 
 Port-free access from any device using Pi-hole DNS + Traefik macvlan:

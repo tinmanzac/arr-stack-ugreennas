@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4] - 2026-01-02
+
+### Changed
+- **Network renamed**: `traefik-proxy` → `arr-stack` (clearer - network is used by all services, not just Traefik)
+- **qbit-scheduler configurable**: Pause/resume hours now set via `QBIT_PAUSE_HOUR` and `QBIT_RESUME_HOUR` env vars
+
+### Documentation
+- **Setup levels clarified**: Core / + local DNS / + remote access terminology consistent throughout
+- **Step 4 reordered**: Jellyfin first (user-facing), then backend services in dependency order
+- **Removed redundant tables**: Service connection table now only in REFERENCE.md
+
+### Migration
+See [UPGRADING.md](docs/UPGRADING.md) for network rename instructions.
+
+---
+
 ## [1.3] - 2025-12-25
 
 ### Changed

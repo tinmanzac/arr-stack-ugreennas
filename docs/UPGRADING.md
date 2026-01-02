@@ -36,6 +36,32 @@ docker compose -f docker-compose.arr-stack.yml up -d  # Restarts containers with
 
 When upgrading across versions, check below for any action required.
 
+### v1.3 → v1.4
+
+**Network renamed:** `traefik-proxy` → `arr-stack`
+
+The old name was confusing - implied Traefik was required for Core setup. The network is used by all services.
+
+```bash
+cd /volume1/docker/arr-stack && \
+git pull origin main && \
+docker compose -f docker-compose.arr-stack.yml down && \
+docker compose -f docker-compose.utilities.yml down 2>/dev/null; \
+docker compose -f docker-compose.cloudflared.yml down 2>/dev/null; \
+docker compose -f docker-compose.traefik.yml down 2>/dev/null; \
+docker network rm traefik-proxy && \
+docker network create --driver=bridge --subnet=172.20.0.0/24 --gateway=172.20.0.1 arr-stack && \
+docker compose -f docker-compose.arr-stack.yml up -d && \
+docker compose -f docker-compose.traefik.yml up -d 2>/dev/null; \
+docker compose -f docker-compose.cloudflared.yml up -d 2>/dev/null; \
+docker compose -f docker-compose.utilities.yml up -d 2>/dev/null; \
+echo "Migration complete"
+```
+
+> **Other containers on the old network?** Update their compose files to use `arr-stack` instead of `traefik-proxy`.
+
+---
+
 ### v1.2.x → v1.3
 
 **Breaking change:** Docker network subnet changed from `192.168.100.0/24` to `172.20.0.0/24`.

@@ -7,16 +7,13 @@ Complete setup guide for the media automation stack. Works on any Docker host wi
 - [Prerequisites](#prerequisites)
 - [Choose Your Setup](#choose-your-setup) ← Start here
 - [Stack Overview](#stack-overview)
-- [Step 1: Create Directories and Clone/Fork Repository](#step-1-create-directories-and-clonefork-repository)
+- [Step 1: Create Directories](#step-1-create-directories-and-clonefork-repository)
 - [Step 2: Configure Settings](#step-2-configure-settings)
 - [Step 3: Start the Stack](#step-3-start-the-stack)
 - [Step 4: Configure Each App](#step-4-configure-each-app)
 - [Step 5: Test](#step-5-test)
-- [✅ Core Complete](#-core-complete)
 - [Local DNS (.lan domains)](#local-dns-lan-domains---optional) ← + local DNS
-- [✅ + local DNS Complete](#--local-dns-complete)
-- [External Access (Optional)](#external-access-optional) ← + remote access
-- [✅ + remote access Complete](#--remote-access-complete)
+- [External Access](#external-access-optional) ← + remote access
 - [Backup](#backup)
 - [Optional Utilities](#optional-utilities)
 

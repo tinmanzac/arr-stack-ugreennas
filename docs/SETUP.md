@@ -84,15 +84,13 @@ Before diving in, decide how you'll access your media stack:
 **Core:**
 - `.env` - VPN credentials, NAS IP, media paths, PUID/PGID
 
-**+ local DNS and above (if using Pi-hole):**
-- `pihole/02-local-dns.conf` - Your `.lan` domain mappings
-
-**+ remote access only (if using Traefik):**
+**+ remote access:**
 - `traefik/traefik.yml` - Replace `yourdomain.com` (3 places)
 - `traefik/dynamic/vpn-services.yml` - Replace `yourdomain.com`
 
 **Files you DON'T edit:**
 - `docker-compose.*.yml` - Work as-is, configured via `.env`
+- `pihole/02-local-dns.conf` - Generated from example via sed command
 - `traefik/dynamic/tls.yml` - Security defaults
 - `traefik/dynamic/local-services.yml` - Auto-generates from `.env`
 

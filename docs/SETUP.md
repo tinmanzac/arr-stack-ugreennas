@@ -227,7 +227,7 @@ sudo chown -R 1000:1000 /srv/docker/arr-stack
 
 </details>
 
-**If using Traefik (+ local DNS or + remote access):**
+**For + local DNS or + remote access, prepare for Traefik:**
 ```bash
 # Prepare certificate storage
 sudo touch /path/to/arr-stack/traefik/acme.json

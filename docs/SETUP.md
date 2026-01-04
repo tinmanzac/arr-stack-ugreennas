@@ -302,7 +302,7 @@ Edit `.env` with your VPN credentials. Gluetun supports 30+ providers—find you
 | 5. Click **"Choose location"** and select a server (e.g., United Kingdom) | <img src="images/Surfshark/5.png" width="700"> |
 | 6. Click the **Download** arrow to get the `.conf` file | <img src="images/Surfshark/6.png" width="700"> |
 
-7. Open the downloaded `.conf` file and note the `Address` value:
+7. Open the downloaded `.conf` file and note the `Address` and `PrivateKey` values:
    ```ini
    [Interface]
    Address = 10.14.0.2/16

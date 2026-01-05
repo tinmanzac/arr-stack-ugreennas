@@ -37,7 +37,6 @@
 
 | Service | IP | Port | Notes |
 |---------|-----|------|-------|
-| Traefik | 172.20.0.2 | 80 | Reverse proxy |
 | **Gluetun** | **172.20.0.3** | — | VPN gateway |
 | ↳ qBittorrent | (via Gluetun) | 8085 | Torrent downloads |
 | ↳ SABnzbd | (via Gluetun) | 8082 | Usenet downloads |
@@ -50,6 +49,12 @@
 | Jellyseerr | 172.20.0.8 | 5055 | Request management |
 | Bazarr | 172.20.0.9 | 6767 | Subtitles |
 | FlareSolverr | 172.20.0.10 | 8191 | Cloudflare bypass |
+
+**+ local DNS** (traefik.yml):
+
+| Service | IP | Port | Notes |
+|---------|-----|------|-------|
+| Traefik | 172.20.0.2 | 80 | Reverse proxy |
 
 **+ remote access** (cloudflared.yml):
 
@@ -66,7 +71,7 @@
 
 ### Service Connection Guide
 
-**VPN-protected services** (qBittorrent, Sonarr, Radarr, Prowlarr) share Gluetun's network via `network_mode: service:gluetun`. This means:
+**VPN-protected services** (qBittorrent, SABnzbd, Sonarr, Radarr, Prowlarr) share Gluetun's network via `network_mode: service:gluetun`. This means:
 
 | From | To | Use | Why |
 |------|-----|-----|-----|
@@ -111,7 +116,7 @@ docker compose -f docker-compose.arr-stack.yml pull
 docker compose -f docker-compose.arr-stack.yml up -d
 ```
 
-> ⚠️ **Never use `docker compose down`** - this stops Pi-hole which kills DNS for your entire network if your router uses Pi-hole. Use `up -d --force-recreate` instead to restart the stack safely.
+> ⚠️ **Never use `docker compose down` (+ local DNS users)** - if your router uses Pi-hole for DNS, stopping it kills DNS for your entire network. Use `up -d --force-recreate` instead.
 
 ## Networks
 
@@ -119,14 +124,14 @@ docker compose -f docker-compose.arr-stack.yml up -d
 |---------|--------|---------|
 | arr-stack | 172.20.0.0/24 | Service communication |
 | vpn-net | 10.8.1.0/24 | Internal VPN routing (WireGuard peers) |
-| traefik-lan | (your LAN)/24 | macvlan - gives Traefik its own LAN IP for .lan domains |
+| traefik-lan | (your LAN)/24 | macvlan for .lan domains (+ local DNS only) |
 
 ## Startup Order
 
 Services start in dependency order (handled automatically by `depends_on`):
 
-1. **Pi-hole** → DNS ready
-2. **Gluetun** → VPN connected (uses Pi-hole for DNS)
+1. **Pi-hole** → DNS ready (for containers; optionally your LAN)
+2. **Gluetun** → VPN connected (uses Pi-hole for internal DNS)
 3. **Sonarr, Radarr, Prowlarr, qBittorrent, SABnzbd** → VPN-protected services
 4. **Jellyseerr, Bazarr** → Connect to Sonarr/Radarr via Gluetun
 5. **Jellyfin, WireGuard, FlareSolverr** → Independent, start anytime

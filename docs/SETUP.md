@@ -47,7 +47,17 @@ Here's what you'll need to get started.
 - SSH access to your host
 - **VPN Subscription** - Any provider supported by [Gluetun](https://github.com/qdm12/gluetun-wiki/tree/main/setup/providers) (Surfshark, NordVPN, PIA, Mullvad, ProtonVPN, etc.)
 
-> **Already using Tailscale?** Skip the WireGuard component - both serve the same purpose here (remote access to your home network). Gluetun is separate (protects download traffic).
+<details>
+<summary><strong>Already using Tailscale?</strong></summary>
+
+This stack has two different WireGuard components:
+
+- **Gluetun's WireGuard** = VPN *client* that protects your downloads. You need this regardless of Tailscale.
+- **WireGuard service** = VPN *server* for accessing your NAS remotely. Tailscale replaces this.
+
+If you use Tailscale: skip the WireGuard *service* (the `WG_PASSWORD_HASH` stuff in `.env`). You still need your VPN provider's WireGuard credentials for Gluetun.
+
+</details>
 
 - **Usenet Provider** (optional, ~$4-6/month) - Frugal Usenet, Newshosting, Eweka, etc.
 - **Usenet Indexer** (optional) - NZBGeek (~$12/year) or DrunkenSlug (free tier)
@@ -229,13 +239,6 @@ sudo chown -R 1000:1000 /srv/docker/arr-stack
 
 </details>
 
-**For + local DNS or + remote access, prepare for Traefik:**
-```bash
-# Prepare certificate storage
-sudo touch /path/to/arr-stack/traefik/acme.json
-sudo chmod 600 /path/to/arr-stack/traefik/acme.json
-```
-
 ### Expected Structure
 
 ```
@@ -248,9 +251,8 @@ sudo chmod 600 /path/to/arr-stack/traefik/acme.json
     └── arr-stack/
         ├── traefik/              # + local DNS / + remote access only
         │   ├── traefik.yml
-        │   ├── acme.json         # SSL certs (chmod 600)
         │   └── dynamic/
-        │       └── tls.yml
+        │       └── vpn-services.yml
         └── cloudflared/          # + remote access only
             └── config.yml
 ```
@@ -778,7 +780,7 @@ Issues? [Report on GitHub](https://github.com/Pharkie/arr-stack-ugreennas/issues
 Access your services from anywhere: `jellyfin.yourdomain.com` instead of only on your home network.
 
 **Requirements:**
-- Domain name (~$8-10/year)
+- Buy a new, external domain name (~$10/year) — [Cloudflare Registrar](https://www.cloudflare.com/products/registrar/) is simplest
 - Cloudflare account (free tier)
 
 ### Cloudflare Tunnel Setup
@@ -840,19 +842,6 @@ cp traefik/traefik.yml.example traefik/traefik.yml
 cp traefik/dynamic/vpn-services.yml.example traefik/dynamic/vpn-services.yml
 # Or for Plex:
 # cp traefik/dynamic/vpn-services-plex.yml.example traefik/dynamic/vpn-services-plex.yml
-```
-
-Edit `traefik/traefik.yml` and replace `yourdomain.com` with your actual domain (3 places):
-
-```yaml
-# Line 31-33: SSL certificate domains
-domains:
-  - main: yourdomain.com      # ← your domain
-    sans:
-      - "*.yourdomain.com"    # ← your domain
-
-# Line 39: Let's Encrypt email
-email: admin@yourdomain.com   # ← your email
 ```
 
 Edit `traefik/dynamic/vpn-services.yml` and replace the Host rules:

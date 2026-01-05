@@ -1,5 +1,7 @@
 # Traefik Static Configuration
 # https://doc.traefik.io/traefik/
+#
+# No edits required - just copy to traefik.yml
 
 global:
   checkNewVersion: true
@@ -14,39 +16,8 @@ api:
 entryPoints:
   web:
     address: ":80"
-    # Redirect disabled - Cloudflare Tunnel handles SSL
-    # http:
-    #   redirections:
-    #     entryPoint:
-    #       to: websecure
-    #       scheme: https
-    #       permanent: true
-
-  websecure:
-    address: ":443"
-    http:
-      tls:
-        certResolver: cloudflare
-        domains:
-          - main: yourdomain.com
-            sans:
-              - "*.yourdomain.com"
-
-# Certificate Resolvers
-certificatesResolvers:
-  cloudflare:
-    acme:
-      email: admin@yourdomain.com
-      storage: /acme.json
-      caServer: https://acme-v02.api.letsencrypt.org/directory
-      # Uncomment for testing to avoid rate limits
-      # caServer: https://acme-staging-v02.api.letsencrypt.org/directory
-      dnsChallenge:
-        provider: cloudflare
-        delayBeforeCheck: 10
-        resolvers:
-          - "1.1.1.1:53"
-          - "1.0.0.1:53"
+    # HTTP only - Cloudflare Tunnel handles SSL for external access
+    # .lan domains use HTTP (no SSL needed for local traffic)
 
 # Providers
 providers:
@@ -71,13 +42,6 @@ accessLog:
   filePath: /var/log/traefik/access.log
   format: common
   bufferingSize: 100
-
-# Metrics (optional, uncomment if needed)
-# metrics:
-#   prometheus:
-#     entryPoint: metrics
-#     addEntryPointsLabels: true
-#     addServicesLabels: true
 
 # Ping for healthcheck
 ping:

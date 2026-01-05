@@ -40,7 +40,7 @@ Watch: Jellyfin — locally or remotely via Traefik
 | Setup | How you access | What you need |
 |-------|----------------|---------------|
 | **Core** | `192.168.1.50:8096` | Just the stack |
-| **+ local DNS** | `jellyfin.lan` | Add Pi-hole + Traefik |
+| **+ local DNS** | `jellyfin.lan` | Configure Pi-hole + add Traefik |
 | **+ remote access** | `jellyfin.yourdomain.com` | Add Cloudflare Tunnel |
 
 ## Get Started

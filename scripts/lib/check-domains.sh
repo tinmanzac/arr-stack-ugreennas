@@ -80,10 +80,10 @@ check_domains() {
             local result
             result=$(dig +short "$ext_domain" 2>/dev/null | head -1)
             if [[ -n "$result" ]]; then
-                # Check HTTP response (allow 200, 301, 302, 401, 403)
+                # Check HTTP response (allow 2xx, 3xx redirects, 401/403 auth)
                 local http_code
                 http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "https://$ext_domain" 2>/dev/null)
-                if [[ "$http_code" =~ ^(200|301|302|401|403)$ ]]; then
+                if [[ "$http_code" =~ ^(200|301|302|303|307|308|401|403)$ ]]; then
                     ((ext_ok++))
                 else
                     echo "      FAIL: $ext_domain - HTTP $http_code"

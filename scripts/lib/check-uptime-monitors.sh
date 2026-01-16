@@ -9,6 +9,7 @@ check_uptime_monitors() {
     # Expected monitors (services that should be monitored)
     local expected=(
         "Bazarr"
+        "Beszel"
         "duc"
         "FlareSolverr"
         "Jellyfin"

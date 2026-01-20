@@ -433,9 +433,9 @@ Streams your media library to any device.
    - TV Shows: Content type "Shows", Folder `/media/tv`
 
 <details>
-<summary><strong>Hardware Transcoding (Intel Quick Sync) - Optional</strong></summary>
+<summary><strong>Hardware Transcoding (Intel Quick Sync) - Recommended for Ugreen</strong></summary>
 
-If your NAS has an Intel CPU (like the Ugreen DXP4800+), you can enable GPU-accelerated transcoding. This reduces CPU usage from ~80% to ~5% when transcoding.
+Ugreen NAS (DXP4800+, etc.) have Intel CPUs with built-in GPUs. Enable this to use GPU-accelerated transcoding - reduces CPU usage from ~80% to ~20% when transcoding. Skip this section if your NAS doesn't have an Intel GPU.
 
 **1. Find your render group ID:**
 ```bash

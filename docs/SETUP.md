@@ -485,7 +485,7 @@ Trickplay generates preview thumbnails when you hover over the video timeline.
 2. Set **Quality** to a low value (e.g., 720p 1Mbps)
 3. Play a video and open **Playback Info** (⚙️ → Playback Info)
 4. Look for **"Transcoding framerate"** - should show **10x+ realtime** (e.g., 400+ fps)
-5. Check Beszel - CPU should stay ~20-30% instead of 80%+
+5. Check CPU usage - should stay ~20-30% instead of 80%+
 
 If transcoding framerate is only ~1x (24-30 fps), hardware acceleration isn't working.
 

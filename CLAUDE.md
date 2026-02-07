@@ -6,7 +6,7 @@
 
 To run commands on the NAS:
 ```bash
-sshpass -p 'PASSWORD' ssh -o StrictHostKeyChecking=no USER@HOSTNAME 'command here'
+sshpass -p 'PASSWORD' ssh -o StrictHostKeyChecking=accept-new USER@HOSTNAME 'command here'
 ```
 
 Read `.claude/config.local.md` first to get the hostname, user, and password.

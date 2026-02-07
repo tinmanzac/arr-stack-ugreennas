@@ -1,6 +1,6 @@
 # Home Assistant Integration
 
-Send notifications from Sonarr/Radarr, Uptime Kuma, and Beszel to Home Assistant.
+Send notifications from Sonarr/Radarr, DIUN, Uptime Kuma, and Beszel to Home Assistant.
 
 ## Prerequisites
 
@@ -51,6 +51,42 @@ Change `notify.persistent_notification` to `notify.mobile_app_your_phone` for pu
 **Radarr:** Same URL and events.
 
 Click **Test** to verify.
+
+## DIUN → Home Assistant
+
+Requires `docker-compose.utilities.yml` deployed.
+
+DIUN monitors all running containers and sends a webhook when a newer image version is available on the registry.
+
+### Step 1: Create HA Automation
+
+```yaml
+alias: DIUN - Arr Stack Image Update Notification
+trigger:
+  - platform: webhook
+    webhook_id: diun-updates
+    allowed_methods:
+      - POST
+action:
+  - service: persistent_notification.create
+    data:
+      title: "Arr Stack - Docker Image Update"
+      message: "{{ trigger.json.diun_entry.image }} has a new version"
+```
+
+### Step 2: Configure .env
+
+Add the webhook URL to your `.env` on the NAS:
+
+```bash
+DIUN_WEBHOOK_URL=http://homeassistant.lan:8123/api/webhook/diun-updates
+```
+
+DIUN checks registries daily at 6am by default. Customise with:
+
+```bash
+DIUN_SCHEDULE=0 6 * * *  # cron format
+```
 
 ## Uptime Kuma → Home Assistant
 

@@ -746,7 +746,7 @@ If you have both qBittorrent and SABnzbd configured, Sonarr/Radarr will grab whi
 
 This gives Usenet a 30-minute head start before considering torrents.
 
-> **Note:** Repeat in both Sonarr and Radarr if you want consistent behavior.
+> **Note:** Do this in both Sonarr and Radarr (same steps in each).
 
 ### 4.10 Pi-hole (DNS)
 
@@ -755,6 +755,8 @@ This gives Usenet a 30-minute head start before considering torrents.
 3. **Upstream DNS:** Settings → DNS → pick upstream servers (1.1.1.1, 8.8.8.8, etc.)
 
 **Optional:** Set your router's DHCP DNS to your NAS IP for network-wide ad-blocking.
+
+> **Warning:** If your NAS goes down, every device on your network will lose internet (DNS stops resolving). To recover: temporarily change your device's DNS to `1.1.1.1` (or enable a VPN) so you can access your router and revert the DHCP DNS setting until Pi-hole is back up.
 
 ---
 

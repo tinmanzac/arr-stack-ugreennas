@@ -389,7 +389,7 @@ docker ps
 docker logs gluetun | grep "Public IP address"
 
 # Verify VPN IP (should NOT be your home IP)
-docker exec gluetun wget -qO- ifconfig.me
+docker exec gluetun wget -qO- https://ipinfo.io/ip
 ```
 
 ---
@@ -768,8 +768,8 @@ Time to verify everything is connected and protected before you start adding con
 
 Run on NAS via SSH:
 ```bash
-docker exec gluetun wget -qO- ifconfig.me       # Should show VPN IP, not your home IP
-docker exec qbittorrent wget -qO- ifconfig.me   # Same - confirms qBit uses VPN
+docker exec gluetun wget -qO- https://ipinfo.io/ip       # Should show VPN IP, not your home IP
+docker exec qbittorrent wget -qO- https://ipinfo.io/ip   # Same - confirms qBit uses VPN
 ```
 
 **Thorough test:** Visit [ipleak.net](https://ipleak.net) from your browser, then run the same test from inside qBittorrent:

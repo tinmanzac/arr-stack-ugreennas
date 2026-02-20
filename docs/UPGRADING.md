@@ -149,13 +149,13 @@ echo "Migration complete"
 - Startup order fixes — Gluetun now waits for Pi-hole to be healthy before connecting
 - Improved healthchecks — FlareSolverr actually tests Chrome, catches crashes
 - Backup script improvements — smart space checking, 7-day rotation
-- SABnzbd added — Usenet downloads via VPN (remove from compose if not wanted); configure in [SETUP.md](SETUP.md#usenet-sabnzbd)
+- SABnzbd added — Usenet downloads via VPN (remove from compose if not wanted); configure in [App Configuration Guide](APP-CONFIG.md#43-sabnzbd-usenet-downloads)
 
 **New features (optional, requires setup):**
 
 | Feature | What it does | Setup |
 |---------|--------------|-------|
-| `.lan` domains | `http://sonarr.lan` etc, no ports | Router DHCP reservation + Pi-hole DNS, see [SETUP.md](SETUP.md#local-dns-lan-domains---optional) |
+| `.lan` domains | `http://sonarr.lan` etc, no ports | Router DHCP reservation + Pi-hole DNS, see [Local DNS Guide](LOCAL-DNS.md) |
 | `MEDIA_ROOT` env var | Configurable media path | Set in `.env` |
 | deunhealth | Auto-restart crashed services | Deploy `docker-compose.utilities.yml` |
 

@@ -21,7 +21,6 @@ check_uptime_monitors() {
         "Radarr"
         "Sonarr"
         "Traefik"
-        "WireGuard"
     )
 
     # Skip if NAS config not available

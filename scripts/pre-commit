@@ -42,6 +42,7 @@ source "$SCRIPT_DIR/lib/check-uptime-monitors.sh"
 source "$SCRIPT_DIR/lib/check-dns-duplicates.sh"
 source "$SCRIPT_DIR/lib/check-domains.sh"
 source "$SCRIPT_DIR/lib/check-image-versions.sh"
+source "$SCRIPT_DIR/lib/check-doc-links.sh"
 
 # Track results
 ERRORS=0
@@ -155,6 +156,17 @@ if [[ -n "$_timeout_cmd" ]]; then
     }
 else
     check_image_versions
+fi
+echo ""
+
+# ==========================================
+# CHECK 11: Documentation Links (BLOCKS)
+# ==========================================
+echo -e "${BLUE}11. Checking documentation links...${NC}"
+if check_doc_links; then
+    echo -e "    ${GREEN}OK${NC}: All internal links valid"
+else
+    ((ERRORS++))
 fi
 echo ""
 

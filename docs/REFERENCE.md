@@ -30,8 +30,8 @@
 
 **Legend:**
 - **Core** — Always works on your LAN
-- **+ local DNS** — Requires [Pi-hole + Traefik setup](SETUP.md#local-dns-lan-domains---optional)
-- **+ remote access** — Requires [Cloudflare Tunnel setup](SETUP.md#external-access--optional). Services marked "—" are LAN-only (not exposed to internet).
+- **+ local DNS** — Requires [Pi-hole + Traefik setup](LOCAL-DNS.md)
+- **+ remote access** — Requires [Cloudflare Tunnel setup](REMOTE-ACCESS.md). Services marked "—" are LAN-only (not exposed to internet).
 
 ## Services & Network
 

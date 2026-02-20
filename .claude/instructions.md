@@ -311,9 +311,13 @@ ssh <user>@<nas-host> "cat /mnt/arr-backup/arr-stack-backup-*.tar.gz" > backups/
 docker exec uptime-kuma sqlite3 /app/data/kuma.db "SELECT id, name, url FROM monitor"
 ```
 
-**Update monitor URL:**
+**Rename or update a monitor:**
 ```bash
+# Rename
+docker exec uptime-kuma sqlite3 /app/data/kuma.db "UPDATE monitor SET name='NewName' WHERE id=ID"
+# Update URL
 docker exec uptime-kuma sqlite3 /app/data/kuma.db "UPDATE monitor SET url='http://NEW_URL' WHERE id=ID"
+# Restart to pick up changes (live-reloads the DB)
 docker restart uptime-kuma
 ```
 

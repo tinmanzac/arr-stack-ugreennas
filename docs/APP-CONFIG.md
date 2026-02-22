@@ -317,7 +317,7 @@ Manages torrent/Usenet indexers and syncs them to Sonarr/Radarr.
 
 4. **Add FlareSolverr** (for protected torrent sites):
    - Settings → Indexers → Add FlareSolverr
-   - Host: `http://172.20.0.10:8191`
+   - Host: `http://localhost:8191` (FlareSolverr shares Gluetun's network with Prowlarr)
    - Tag: `flaresolverr`
    - **Note:** FlareSolverr doesn't bypass all Cloudflare protections - some indexers may still fail. If you have issues, [Byparr](https://github.com/ThePhaseless/Byparr) is a drop-in alternative using different browser tech.
 5. **Connect to Sonarr:**

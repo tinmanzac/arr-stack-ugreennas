@@ -47,7 +47,7 @@ docker restart uptime-kuma
 | Bazarr | HTTP | `http://bazarr:6767/ping` | Has own IP |
 | Beszel | HTTP | `http://172.20.0.15:8090` | Use static IP |
 | duc | HTTP | `http://duc:80` | Has own IP |
-| FlareSolverr | HTTP | `http://172.20.0.10:8191` | Use static IP |
+| FlareSolverr | HTTP | `http://172.20.0.3:8191` | Via Gluetun |
 | Jellyfin | HTTP | `http://jellyfin:8096/health` | Has own IP |
 | Pi-hole | HTTP | `http://pihole:80/admin` | Has own IP |
 | Prowlarr | HTTP | `http://gluetun:9696/ping` | Via Gluetun |

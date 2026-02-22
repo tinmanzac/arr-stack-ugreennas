@@ -253,7 +253,7 @@ docker restart pihole
 | Pi-hole | v6 API uses password not separate token |
 | Gluetun | VPN gateway. Services using it share IP 172.20.0.3. Uses Pi-hole DNS. `FIREWALL_OUTBOUND_SUBNETS` must include LAN for HA access |
 | Cloudflared | SSL terminated at Cloudflare, Traefik receives HTTP |
-| FlareSolverr | Cloudflare bypass for Prowlarr. Configure in Prowlarr: Settings → Indexers → add FlareSolverr with Host `flaresolverr.lan` |
+| FlareSolverr | Cloudflare bypass for Prowlarr (via Gluetun VPN). Configure in Prowlarr: Settings → Indexers → add FlareSolverr with Host `localhost:8191` |
 
 ## Container Updates
 

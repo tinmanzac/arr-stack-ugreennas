@@ -157,7 +157,7 @@ Add a root crontab `@reboot` job to persist across reboots (do **not** use `/etc
 
 ## qBittorrent Tuning (TRaSH Recommended)
 
-Tools → Options → BitTorrent:
+Tools → Options → Connection:
 - **Enable UPnP / NAT-PMP:** ❌ (unnecessary behind VPN, potential security risk)
 
 Tools → Options → Speed:

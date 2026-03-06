@@ -170,12 +170,12 @@ This release adds TRaSH Guides best practices: hardlinks, naming schemes, downlo
 
 ```bash
 ssh your-username@nas-ip
-mkdir -p /volume1/data/media
-mv /volume1/data/movies /volume1/data/media/movies
-mv /volume1/data/tv /volume1/data/media/tv
-mkdir -p /volume1/data/torrents/{tv,movies}
-mkdir -p /volume1/data/usenet/{incomplete,complete/{tv,movies}}
-chown -R 1000:1000 /volume1/data/media /volume1/data/torrents /volume1/data/usenet
+sudo mkdir -p /volume1/data/media
+sudo mv /volume1/data/movies /volume1/data/media/movies
+sudo mv /volume1/data/tv /volume1/data/media/tv
+sudo mkdir -p /volume1/data/torrents/{tv,movies}
+sudo mkdir -p /volume1/data/usenet/{incomplete,complete/{tv,movies}}
+sudo chown -R 1000:1000 /volume1/data/media /volume1/data/torrents /volume1/data/usenet
 ```
 
 #### 2. Pull and redeploy
@@ -266,7 +266,7 @@ After configuring naming, rename existing files and folders:
 > ```bash
 > ./scripts/fix-radarr-paths.sh
 > ```
-> This compares Radarr's database paths against actual directories on disk and fixes any mismatches. Safe to run multiple times.
+> This compares Radarr's database paths against actual directories on disk and fixes any mismatches. LLM-generated and human-reviewed; check the script before running.
 
 #### 11. Enable NFO metadata (recommended)
 

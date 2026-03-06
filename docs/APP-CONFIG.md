@@ -75,6 +75,8 @@ Receives download requests from Sonarr and Radarr and downloads files via torren
 
    > **Why categories matter:** Sonarr/Radarr tell qBittorrent which category to use when requesting downloads. qBittorrent puts files in the category's save path. After download completes, Sonarr/Radarr create hardlinks from `/data/torrents/tv` or `/data/torrents/movies` to your library (`/data/media/tv` or `/data/media/movies`). If categories don't match, downloads won't be found.
 
+7. **Set stall timeout:** Tools → Options → BitTorrent → Seeding Limits → **When inactive for:** `30` minutes → **Pause torrent**. This lets Sonarr/Radarr detect stalled downloads and automatically search for alternatives.
+
 > **Optional:** [qBittorrent tuning](APP-CONFIG-ADVANCED.md#qbittorrent-tuning-trash-recommended) (TRaSH recommended settings for encryption, UPnP, VueTorrent mobile UI).
 
 ## 4.3 SABnzbd (Usenet Downloads)
@@ -123,7 +125,7 @@ Searches for TV shows, sends download links to qBittorrent/SABnzbd, and organize
 1. **Access:** `http://NAS_IP:8989`
 2. **Create admin account** when prompted
 3. **Add Root Folder:** Settings → Media Management → `/data/media/tv`
-3. **Add Download Client(s):** Settings → Download Clients
+4. **Add Download Client(s):** Settings → Download Clients
 
    **qBittorrent (torrents):**
    - Add → qBittorrent
@@ -138,7 +140,7 @@ Searches for TV shows, sends download links to qBittorrent/SABnzbd, and organize
    - API Key: (from SABnzbd Config → General)
    - Category: `tv`
 
-4. **Enable NFO metadata:** Settings → Metadata → Kodi (XBMC) / Emby → **Enable** (see [why this matters](#nfo-metadata))
+5. **Enable NFO metadata:** Settings → Metadata → Kodi (XBMC) / Emby → **Enable** (see [why this matters](#nfo-metadata))
    - Series Metadata: ✅
    - Episode Metadata: ✅
    - All image options: ❌ (Jellyfin handles its own artwork)
@@ -154,7 +156,7 @@ Searches for TV shows, sends download links to qBittorrent/SABnzbd, and organize
 
    > These follow [TRaSH Guides Sonarr naming](https://trash-guides.info/Sonarr/Sonarr-recommended-naming-scheme/). After saving, rename existing files: Series → Select All → Organize.
 
-6. **Block ISOs:** Some indexers serve disc images that Jellyfin can't play.
+7. **Block ISOs:** Some indexers serve disc images that Jellyfin can't play.
    - Settings → Custom Formats → + → Name: `Reject ISO`
    - Add condition: Release Title, value `\.iso$`, check **Regex**
    - Settings → Profiles → your quality profile → set `Reject ISO` to `-10000`
@@ -166,7 +168,7 @@ Searches for movies, sends download links to qBittorrent/SABnzbd, and organizes 
 1. **Access:** `http://NAS_IP:7878`
 2. **Create admin account** when prompted
 3. **Add Root Folder:** Settings → Media Management → `/data/media/movies`
-3. **Add Download Client(s):** Settings → Download Clients
+4. **Add Download Client(s):** Settings → Download Clients
 
    **qBittorrent (torrents):**
    - Add → qBittorrent
@@ -181,18 +183,18 @@ Searches for movies, sends download links to qBittorrent/SABnzbd, and organizes 
    - API Key: (from SABnzbd Config → General)
    - Category: `movies`
 
-4. **Enable NFO metadata:** Settings → Metadata → Kodi (XBMC) / Emby → **Enable** (see [why this matters](#nfo-metadata))
+5. **Enable NFO metadata:** Settings → Metadata → Kodi (XBMC) / Emby → **Enable** (see [why this matters](#nfo-metadata))
    - Movie Metadata: ✅
    - Movie Images: ❌ (Jellyfin handles its own artwork)
 
-5. **Configure naming (TRaSH recommended):** Settings → Media Management → Movie Naming
+6. **Configure naming (TRaSH recommended):** Settings → Media Management → Movie Naming
    - **Rename Movies:** ✅
    - **Standard Movie Format:** `{Movie CleanTitle} {(Release Year)} {imdb-{ImdbId}} - {Edition Tags }{[Custom Formats]}{[Quality Full]}{[MediaInfo AudioCodec}{ MediaInfo AudioChannels]}{[MediaInfo VideoDynamicRangeType]}{[Mediainfo VideoCodec]}{-Release Group}`
    - **Movie Folder Format:** `{Movie CleanTitle} ({Release Year})`
 
    > These follow [TRaSH Guides Radarr naming](https://trash-guides.info/Radarr/Radarr-recommended-naming-scheme/). After saving, rename existing files: Movies → Select All → Organize.
 
-6. **Block ISOs:** Some indexers serve disc images that Jellyfin can't play.
+7. **Block ISOs:** Some indexers serve disc images that Jellyfin can't play.
    - Settings → Custom Formats → + → Name: `Reject ISO`
    - Add condition: Release Title, value `\.iso$`, check **Regex**
    - Settings → Profiles → your quality profile → set `Reject ISO` to `-10000`
@@ -227,7 +229,7 @@ Manages torrent/Usenet indexers and syncs them to Sonarr/Radarr.
 1. **Access:** `http://NAS_IP:9696`
 2. **Create admin account** when prompted
 3. **Add Torrent Indexers:** Indexers (left sidebar) → + button → search by name
-3. **If using SABnzbd: Add Usenet Indexer**
+4. **If using SABnzbd: Add Usenet Indexer**
    - **Indexers** (left sidebar, NOT Settings → Indexer Proxies) → + button
    - Search by indexer name (e.g., "NZBGeek", "DrunkenSlug", "NZBFinder")
    - API Key: (from your indexer account → API section)

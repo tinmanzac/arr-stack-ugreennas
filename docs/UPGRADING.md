@@ -40,7 +40,7 @@ When upgrading across versions, check below for any action required.
 
 ### v1.7.2 → v1.7.3
 
-Fixes `.lan` DNS resolution inside VPN-tunneled containers and adds a script to fix duplicate Jellyfin entries after enabling TRaSH naming.
+Fixes `.lan` DNS resolution inside VPN-tunneled containers, adds a script to fix duplicate Jellyfin entries after enabling TRaSH naming, and improves Seerr configuration.
 
 #### 1. Pull and redeploy
 
@@ -75,6 +75,23 @@ If you enabled TRaSH naming in v1.7 and have duplicate show entries in Jellyfin:
 ```
 
 Then trigger a Jellyfin library scan (Dashboard → Libraries → Scan All Libraries).
+
+#### 4. Fix Seerr library sync and quality defaults
+
+If movies/shows stay stuck at "Requested" in Seerr even though they're downloaded:
+
+1. **Enable Jellyfin libraries:** Settings → Jellyfin → toggle **Movies** and **TV** on → Save
+2. **Sync:** Click **Sync Libraries** then **Start Scan** on the same page
+3. **Update quality profiles:** Settings → Services → edit Radarr server → Quality Profile: `UHD Bluray + WEB`. Edit Sonarr server → Quality Profile: `Ultra-HD`
+
+#### 5. Whitelist local networks in qBittorrent
+
+Prevents API scripts and Sonarr/Radarr from getting IP-banned after container restarts:
+
+Tools → Options → Web UI → Authentication:
+- **Bypass authentication for clients on localhost:** ✅
+- **Bypass authentication for clients in whitelisted IP subnets:** ✅
+- **Whitelisted subnets:** `172.20.0.0/24, YOUR_LAN/24, 127.0.0.0/8`
 
 ---
 

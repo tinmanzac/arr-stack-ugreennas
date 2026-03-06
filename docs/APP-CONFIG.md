@@ -261,11 +261,17 @@ Lets users browse and request movies/TV shows.
    - Settings → Services → Add Radarr:
      - **Hostname:** `gluetun` (internal Docker hostname)
      - **Port:** `7878`
+     - **Quality Profile:** `UHD Bluray + WEB` (ensures all requests get the best available quality)
      - **External URL:** `http://radarr.lan` (or `http://NAS_IP:7878`) — makes "Open in Radarr" links work in your browser
    - Settings → Services → Add Sonarr:
      - **Hostname:** `gluetun`
      - **Port:** `8989`
+     - **Quality Profile:** `Ultra-HD`
      - **External URL:** `http://sonarr.lan` (or `http://NAS_IP:8989`)
+4. **Enable Jellyfin Libraries:** Settings → Jellyfin → toggle **Movies** and **TV** on → Save
+5. **Sync Libraries:** On the same page, click **Sync Libraries** then **Start Scan**
+
+> **Why libraries matter:** Without this, Seerr doesn't know what's already in your Jellyfin library. Movies and shows will stay stuck at "Requested" even after they're downloaded and playable.
 
 ## 4.8 Bazarr (Subtitles)
 
